@@ -11,7 +11,11 @@ export default class ClosedSidebar extends React.Component {
       <div className={cx('sidebar-floating', 'dyslexi-render')}>
         <FloatingButton
           icon="settings"
-          onClick={() => this.props.setAppState({ sidebar: true })}
+          onClick={() => this.props.setAppState({ sidebar: true, lock: false })}
+        />
+        <FloatingButton
+          icon="lock-open"
+          onClick={() => this.props.setAppState({ sidebar: true, lock: true })}
         />
         <FloatingButton
           icon={

@@ -12,6 +12,7 @@ export default class Sidebar extends React.Component {
   constructor(props) {
     super(props)
   }
+
   render() {
     return (
       <div className={cx('sidebar', 'dyslexi-render')}>
@@ -20,7 +21,7 @@ export default class Sidebar extends React.Component {
         </div>
         <div className={cx('sidebar-content')}>
           <div className={cx('list-group', 'list-group-flush')}>
-            <Group
+            {this.props.allow && this.props.allow == true ? <Group
               label="Text enhancements"
               help="Change how big the text is or how spaced apart it is."
               {...this.props}
@@ -46,13 +47,13 @@ export default class Sidebar extends React.Component {
                   </span>
                 }
               />
-            </Group>
-            <Group
+            </Group> : null}
+            {this.props.allow && this.props.allow == true ? <Group
               label="Boxes around paragraphs"
               help="Show a box around each paragraph."
               {...this.props}
               switch="paragraphBorder"
-            ></Group>
+            ></Group> : null}
             <Group
               help="Change the font the text is shown in."
               label="Font"
@@ -102,7 +103,7 @@ export default class Sidebar extends React.Component {
                 }
               />
             </Group>
-            <Group
+            {this.props.allow && this.props.allow == true ? <Group
               help="Show small dots between every syllable"
               label="Split up syllables"
               {...this.props}
@@ -113,8 +114,8 @@ export default class Sidebar extends React.Component {
                   Turn on full screen mode to use this feature.
                 </span>
               )}
-            </Group>
-            <Group
+            </Group> : null}
+            {this.props.allow && this.props.allow == true ? <Group
               help="Add a light transparent color to the entire page, which affects the background color and the text color."
               label="Color tint"
               {...this.props}
@@ -122,7 +123,7 @@ export default class Sidebar extends React.Component {
               switchOff="backgroundTint"
             >
               <ColorPicker {...this.props} propertyName="colorTintBase" />
-            </Group>
+            </Group> : null}
             <Group
               help="Change the background color without affecting the text color."
               label="Background tint"
@@ -132,7 +133,7 @@ export default class Sidebar extends React.Component {
             >
               <ColorPicker {...this.props} propertyName="backgroundTintBase" />
             </Group>
-            <TestAgain {...this.props} />
+            {this.props.allow && this.props.allow == true ? <TestAgain {...this.props} /> : null}
           </div>
         </div>
         <ReactTooltip />

@@ -12,13 +12,16 @@ import ColorTint from './Tools/ColorTint'
 import TextStyle from './Tools/TextStyle'
 import LineFocus from './Tools/LineFocus'
 import OutroFormView from './Tools/OutroFormView'
+import Check from './Sidebar/check'
+import axios from 'axios'
 
 export default class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       appState: null,
-      article_data: null
+      article_data: null,
+      allow: null,
     }
     this.setAppState = this.setAppState.bind(this)
     this.refreshState = this.refreshState.bind(this)
@@ -62,6 +65,32 @@ export default class App extends React.Component {
       ManipulationTools.updateReadingTheme(appState)
     })
   }
+  handleLogin(token) {
+    console.log({ token })
+    chrome.storage.sync.set({ token })
+  }
+  checkLogin() {
+    chrome.storage.sync.get('token', async result => {
+      try {
+        let body = result;
+        let data = await axios.post('https://api.dyslex.ie/verifyDetails', body);
+        console.log({data})
+        if (data) {
+          if (data.data.data.subscription) {
+            if (new Date(data.data.data.subscription.activeSubscription.subscriptionEndDate) >= new Date()) {
+              this.setState({ allow: true })
+            }
+          } else {
+            if (new Date(data.data.data.trialEndDate) >= new Date()) {
+              this.setState({ allow: true })
+            }
+          }
+        }
+      } catch (error) {
+        console.log("No premium plan found")
+      }
+    })
+  }
   render() {
     let content = (
       <div>
@@ -83,14 +112,24 @@ export default class App extends React.Component {
         )
         break
       case 'article':
-        if (this.state.appState.sidebar) {
+        if (this.state.appState.sidebar && this.state.appState.lock == false) {
           content = (
             <Sidebar
               setAppState={this.setAppState}
               appState={this.state.appState}
+              allow={this.state.allow}
             />
           )
-        } else {
+        } else if (this.state.appState.sidebar && this.state.appState.lock == true) {
+          content = (
+            <Check
+              appState={this.state.appState}
+              setAppState={this.setAppState}
+              setToken={this.handleLogin}
+            />
+          )
+        }
+        else {
           content = (
             <ClosedSidebar
               setAppState={this.setAppState}
@@ -124,11 +163,12 @@ export default class App extends React.Component {
     this.setState({
       article_document: document.cloneNode(true)
     })
+    this.checkLogin();
 
     /* global chrome */
     this.refreshState()
 
-    chrome.runtime.onMessage.addListener(function(
+    chrome.runtime.onMessage.addListener(function (
       request,
       sender,
       sendResponse
